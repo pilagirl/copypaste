@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>복사-붙여넣기 60문제 연습</title>
+<style>
+body {
+  font-family:"Comic Sans MS","맑은 고딕",sans-serif; 
+  background:#e8f9e8; 
+  margin:0; 
+  padding:24px; 
+  display:flex; 
+  justify-content:center; 
+}
+h1 { 
+  text-align:center; 
+  color:#339966; 
+  margin-bottom:20px; 
+}
+.container { 
+  width:90%; 
+  max-width:700px; 
+  display:flex; 
+  flex-direction:column; 
+  align-items:center; 
+}
+.box { 
+  border:3px solid #b3e6b3; 
+  padding:30px; 
+  margin:0 auto; 
+  background:#f0fcf0; 
+  border-radius:20px; 
+  box-shadow:0 6px 12px rgba(127,201,127,0.3); 
+  transition:0.5s; 
+  position:relative; 
+  text-align:center; 
+  min-height:400px;
+  width:100%;
+  max-width:700px;
+}
+.questionTitle { 
+  font-size:2vw; 
+  min-font-size:26px; 
+  font-weight:bold; 
+  color:#339966; 
+  margin-bottom:12px; 
+}
+.questionText { 
+  font-size:1.8vw; 
+  min-font-size:18px; 
+  margin:12px 0; 
+}
+.exampleText { 
+  font-size:2.5vw; 
+  min-font-size:24px; 
+  margin:16px 0; 
+  color:#006633; 
+  transition:0.5s; 
+  line-height:2; 
+  white-space:pre-line;
+}
+.copyHint { 
+  font-size:1.2vw; 
+  min-font-size:16px; 
+  color:#336600; 
+  margin:12px 0; 
+  font-weight:bold; 
+}
+textarea,input { 
+  width:90%; 
+  padding:14px; 
+  margin-top:10px; 
+  font-size:2vw; 
+  min-font-size:18px; 
+  border:2px solid #a3d9a3; 
+  border-radius:12px; 
+  background:#f6fff6; 
+  text-align:center; 
+}
+button { 
+  margin:10px 6px 0 6px; 
+  padding:12px 20px; 
+  font-size:1.8vw; 
+  min-font-size:16px; 
+  background:#339966; 
+  color:white; 
+  border:none; 
+  border-radius:12px; 
+  cursor:pointer; 
+  transition:0.2s; 
+}
+button:hover { 
+  background:#66cc66; 
+  transform:scale(1.05); 
+}
+.result { 
+  font-size:1.8vw; 
+  min-font-size:18px; 
+  font-weight:bold; 
+  margin-top:10px; 
+  transition:0.3s; 
+}
+.highlight { 
+  animation: bounce 0.4s; 
+}
+@keyframes bounce { 
+  0%{transform:scale(1);}50%{transform:scale(1.2);}100%{transform:scale(1);} 
+}
+.floating { 
+  position:absolute; 
+  font-size:2vw; 
+  min-font-size:20px; 
+  animation:floatUp 4s linear; 
+}
+@keyframes floatUp { 
+  0%{transform:translateY(0);}100%{transform:translateY(-150px); opacity:0;} 
+}
+#progressBar { 
+  height:24px; 
+  width:100%; 
+  background:#c6f0c0; 
+  border-radius:12px; 
+  margin-bottom:16px; 
+  overflow:hidden;
+}
+#progress { 
+  height:100%; 
+  width:0%; 
+  background:#339966; 
+  transition:0.3s; 
+  border-radius:12px; 
+}
+
+/* 반응형 조정 */
+@media(max-width:600px){
+  .exampleText { font-size:5vw; }
+  textarea,input { font-size:4vw; }
+  button { font-size:4vw; }
+  .questionTitle { font-size:5vw; }
+  .questionText { font-size:4.5vw; }
+  .copyHint { font-size:3.5vw; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>🌱 복사-붙여넣기 60문제 연습 🌱</h1>
+<div id="progressBar"><div id="progress"></div></div>
+<div class="box" id="problemBox">
+  <div class="questionTitle" id="questionTitle"></div>
+  <div class="questionText" id="questionText"></div>
+  <div class="exampleText" id="exampleText"></div>
+  <div class="copyHint">💡 복사: Ctrl + C / 붙여넣기: Ctrl + V</div>
+  <div id="answerArea"></div>
+  <button id="checkBtn">✅ 정답 확인</button>
+  <div class="result" id="result"></div>
+  <button id="nextBtn" style="display:none;">➡ 다음 문제</button>
+</div>
+</div>
+
+
+<script>
+const sentenceProblems = [
+"나는 사과를 좋아해요.","오늘은 날씨가 맑아요.","나는 초등학생이에요.","책 읽는 것을 좋아해요.","강아지가 귀여워요.",
+"우유를 마셨어요.","우리 집은 용인에 있어요.","나는 피자를 좋아해요.","학교에 가는 길이에요.","친구와 함께 놀아요.",
+"봄에는 꽃이 피어요.","나는 수학을 공부해요.","연필로 글씨를 써요.","나는 노래를 불러요.","바닷가에 놀러 가고 싶어요."
+];
+
+const emojiProblems = [
+"😊 🍎 🌈 🐶 🐱|🍎","🐯 🦁 🐵 🐸 🐧|🐸","🍓 🍌 🍇 🍒 🍍|🍌",
+"⚽ 🏀 🏈 🎾 🏐|🏀","🚗 🚌 🚲 🚂 🚕|🚲","🐟 🐢 🦀 🐙 🐳|🐙",
+"🎵 🎤 🎻 🎹 🥁|🎹","☀️ 🌙 ⭐ 🌈 ⛅|⭐","📚 ✏️ 🖍️ 📖 📝|📚",
+"🏠 🏫 🏢 🏥 🏦|🏫","🍔 🍕 🍟 🌭 🍿|🍕","🎂 🍩 🍪 🧁 🍫|🍩",
+"🐝 🐞 🦋 🐛 🦗|🦋","🌲 🌳 🌴 🌵 🎄|🌵","🚀 ✈️ 🚁 🚤 🚢|🚀"
+];
+
+let problems = [];
+for(let i=0;i<2;i++){
+  sentenceProblems.forEach(s=>problems.push({type:"sentence", question:"다음 문장을 복사해 붙여넣으세요.", example:s, answer:s}));
+  emojiProblems.forEach(e=>{ const [opts, ans] = e.split("|"); problems.push({type:"emoji", question: ans + " 이모지만 복사해 붙여넣으세요.", example:opts, answer:ans}); });
+}
+problems = problems.sort(()=>Math.random()-0.5);
+
+let current = 0;
+let history = [];
+
+function randomColor(){ 
+  const colors=["#f0fcf0","#e6f9e6","#f3fef3","#eafdf0","#f6fff6"];
+  return colors[Math.floor(Math.random()*colors.length)];
+}
+
+function updateProgress(){
+  const percent = ((current)/problems.length)*100;
+  document.getElementById("progress").style.width = percent+"%";
+}
+
+function loadProblem(){
+  if(current>=problems.length){
+    let correctCount = history.filter(h=>h.correct).length;
+    let wrongProblems = history.filter(h=>!h.correct);
+    let html = `<h2 style='color:#339966'>🎉 연습 완료! 잘했어요! 🌱👏</h2>`;
+    html += `<p>총 문제: ${problems.length} | 정답: ${correctCount} | 오답: ${wrongProblems.length}</p>`;
+    if(wrongProblems.length>0){
+      html += "<h3>❌ 다시 확인해볼 문제:</h3><ul>";
+      wrongProblems.forEach((w,i)=>{
+        html += `<li>${w.question} → 정답: ${w.answer}</li>`;
+      });
+      html += "</ul>";
+    }
+    document.getElementById("problemBox").innerHTML = html;
+    document.getElementById("progress").style.width="100%";
+    return;
+  }
+
+  const p = problems[current];
+  document.getElementById("problemBox").style.backgroundColor = randomColor();
+  document.getElementById("questionTitle").textContent = `문제 ${current+1} / ${problems.length}`;
+  document.getElementById("questionText").textContent = p.question;
+  document.getElementById("exampleText").textContent = p.example;
+  document.getElementById("result").textContent = "";
+  document.getElementById("nextBtn").style.display="none";
+  
+  const area = document.getElementById("answerArea");
+  area.innerHTML = p.type==="sentence"
+    ? '<textarea id="userInput" rows="2" placeholder="여기에 붙여넣으세요 🌟"></textarea>'
+    : '<input type="text" id="userInput" placeholder="여기에 붙여넣으세요 🌟">';
+  document.getElementById("userInput").focus();
+  updateProgress();
+}
+
+function checkAnswer(){
+  const p = problems[current];
+  const userInput = document.getElementById("userInput").value.trim();
+  const result = document.getElementById("result");
+  let isCorrect = userInput===p.answer;
+  history.push({question:p.question, answer:p.answer, correct:isCorrect});
+  if(isCorrect){
+    result.style.color="#006633";
+    result.textContent="🎉 정답이에요! 최고예요 💚";
+    result.classList.add("highlight");
+    createFloatingEmoji(document.getElementById("problemBox"));
+    setTimeout(()=> result.classList.remove("highlight"),500);
+    document.getElementById("nextBtn").style.display="inline-block";
+  } else {
+    result.style.color="#cc3300";
+    result.textContent="❌ 조금 더 노력해요 🌿";
+    result.classList.add("highlight");
+    setTimeout(()=> result.classList.remove("highlight"),500);
+  }
+}
+
+document.getElementById("checkBtn").addEventListener("click", checkAnswer);
+document.getElementById("nextBtn").addEventListener("click",()=>{
+  current++;
+  loadProblem();
+});
+
+function createFloatingEmoji(parent){
+  const emojiList=["💚","💛","💖","⭐","🌸"];
+  const emoji = document.createElement("div");
+  emoji.className="floating";
+  emoji.textContent = emojiList[Math.floor(Math.random()*emojiList.length)];
+  emoji.style.left = Math.random()*80 + "%";
+  parent.appendChild(emoji);
+  setTimeout(()=> parent.removeChild(emoji),4000);
+}
+
+// 엔터키 입력 시 정답 확인
+document.addEventListener("keydown",(e)=>{
+  const input = document.activeElement;
+  if(e.key==="Enter" && (input.tagName==="TEXTAREA" || input.tagName==="INPUT")){
+    e.preventDefault();
+    checkAnswer();
+  }
+});
+
+window.addEventListener("DOMContentLoaded", loadProblem);
+</script>
+
+</body>
+</html>
